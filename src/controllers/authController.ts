@@ -1,15 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
+import fs from 'fs';
+import path from 'path';
 
-const privateKey = process.env.PRIVATE_KEY || 'default-private-key';
-const publicKey = process.env.PUBLIC_KEY || 'default-public-key';
+// Carregar as chaves RSA dos arquivos gerados
+const privateKey = fs.readFileSync(path.resolve(__dirname, '../../private.pem'), 'utf8');
+const publicKey = fs.readFileSync(path.resolve(__dirname, '../../public.pem'), 'utf8');
+
+if (!privateKey || !publicKey) {
+  throw new Error('Chaves RSA não configuradas corretamente');
+}
+
 interface LoginRequest extends Request {
   body: {
     email: string;
     password: string;
   };
 }
+
 interface DecryptRequest extends Request {
   body: {
     token: string;
@@ -27,7 +36,7 @@ export const login = (req: LoginRequest, res: Response, next: NextFunction) => {
     const timestamp = new Date().toISOString();
 
     const payload = { email, password, timestamp };
-    const token = jwt.sign(payload, privateKey, { algorithm: 'HS256' });
+    const token = jwt.sign(payload, privateKey, { algorithm: 'RS256' });
 
     res.json({ token });
   } catch (error) {
@@ -44,7 +53,7 @@ export const decrypt = (req: DecryptRequest, res: Response, next: NextFunction) 
   try {
     const { token } = req.body;
 
-    const payload = jwt.verify(token, publicKey);
+    const payload = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
     res.json({ payload });
   } catch (error) {
     res.status(400).json({ error: 'Invalid token' });
