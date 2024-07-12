@@ -160,10 +160,15 @@ project-root
 │   ├── app.ts
 │   └── index.ts
 ├── .dockerignore
+├── .env
 ├── .gitignore
-├── Dockerfile
+├── .Dockerfile
+├── .generateKeys.js
+├── package-lock.json
 ├── package.json
-├── tsconfig.json
-└── README.md
+├── private.pem
+├── public.pem
+├── README.md
+└── tsconfig.json
 ```
    
