@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import authRoutes from './routes/authRoutes';
 import swaggerUi from 'swagger-ui-express';
@@ -13,7 +13,15 @@ app.use('/auth', authRoutes);
 
 app.use(express.static('public'));
 
-const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/swagger.json'), 'utf8'));
+let swaggerDocument: object;
+try {
+  const swaggerPath = path.resolve(__dirname, '../public/swagger.json');
+  const swaggerData = fs.readFileSync(swaggerPath, 'utf8');
+  swaggerDocument = JSON.parse(swaggerData);
+} catch (error) {
+  console.error('Erro ao ler ou parsear o arquivo swagger.json:', error);
+  process.exit(1);
+}
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
