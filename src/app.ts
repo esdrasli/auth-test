@@ -5,6 +5,9 @@ import swaggerUi from 'swagger-ui-express';
 import path from 'path';
 import fs from 'fs';
 import errorHandler from './middleware/errorHandler';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 
